@@ -1,0 +1,103 @@
+#SET UP 
+import robot
+import time
+R = robot.Robot(max_motor_voltage = 9) #Overvolting the motors to make them faster
+
+R.enable_5v = True
+R.servos[0] = 90
+R.servos[1] = -130 #Placing the wire upright
+
+R.enable_5v = False #Cutting the power to the servos to stop strain
+
+savedMarkers = []
+initial = 0
+
+
+#DIRECTIONS - Motors go in opposite directions
+def turnLeft(degrees):
+  degrees = abs(degrees) #forces degrees to be positive
+  print('Turning left',degrees,'degrees.')
+  R.motors[0] = degrees
+  R.motors[1] = degrees
+  time.sleep(1)
+
+def turnRight(degrees):
+  degrees = (-1)*(abs(degrees)) #forces degrees to be negative
+  print('Turning right',degrees,'degrees.')
+  R.motors[0] = degrees
+  R.motors[1] = degrees
+  time.sleep(1)
+
+def stop():
+  print('Stopping.')
+  R.motors[0] = 0
+  R.motors[1] = 0
+  time.sleep(1)
+
+
+#MARKER TRACKING
+def followMarker(markertoFollow,grabBox):
+  print('Moving towards the marker.')
+  lastAngle = seekMarker(markertoFollow,0)
+  initial = lastAngle #increased precision for grabbing crates later
+  markers = R.see()
+  markers = [m for m in markers if m.info.id == markertoFollow] #checks to make sure marker still exists
+  for marker in markers:
+    times = int(marker.dist*5.5)
+    print('Need to travel',times,'times.')
+    for i in range(times): #repeated searching and turning
+      seekMarker(markertoFollow,lastAngle)
+      time.sleep(0.2)
+      R.motors[0] = 80
+      R.motors[1] = -80
+      time.sleep(0.2)
+      print('Made it to the marker.')      
+  if len(markers) == 0:
+    print('Lost the marker, trying again.')
+    savedMarkers.remove(markertoFollow)
+    findCrate(savedMarkers)      
+  if grabBox == True: #if we're grabbing a crate
+    grabCrate(initial)
+  else:
+    return 0 
+
+def seekMarker(markertoFollow,lastAngle):
+  markers = R.see()
+  if len(markers) == 0: #increasing precision when really close to the crate
+    print('Lost the marker, going backwards.')
+    R.motors[0] = -20
+    R.motors[1] = 20
+    time.sleep(0.5)
+    correcting = (-1)*(lastAngle/3)
+    if correcting>0:
+      turnRight(correcting)
+    else:
+      turnLeft(correcting)
+  for marker in markers:
+    if marker.info.id == markertoFollow:
+      angle = int((5)*(marker.bearing.y))
+      print('Angle:',angle)
+      if -10<=angle<=10:
+        print('Facing towards the marker.')
+        time.sleep(1)
+      elif angle<0:
+        print('Tracking to the right.')
+        turnRight(angle/4)
+      elif angle<0:
+        print('Tracking to the left.')
+        turnLeft(angle/4)
+             
+             
+
+
+
+
+
+
+
+
+
+
+
+
+             
