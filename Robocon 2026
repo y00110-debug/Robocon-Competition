@@ -1,13 +1,13 @@
 #SET UP 
 import robot
 import time
-R = robot.Robot(max_motor_voltage = 9) #Overvolting the motors to make them faster
+R = robot.Robot(max_motor_voltage = 9) #overvolting the motors to make them faster
 
 R.enable_5v = True
 R.servos[0] = 90
-R.servos[1] = -130 #Placing the wire upright
+R.servos[1] = -130 #placing the wire upright
 
-R.enable_5v = False #Cutting the power to the servos to stop strain
+R.enable_5v = False #cutting the power to the servos to stop strain
 
 savedMarkers = []
 initial = 0
@@ -35,7 +35,7 @@ def stop():
   time.sleep(1)
 
 
-#MARKER TRACKING
+#MARKER TRACKING - For both walls and crates
 def followMarker(markertoFollow,grabBox):
   print('Moving towards the marker.')
   lastAngle = seekMarker(markertoFollow,0)
@@ -86,8 +86,52 @@ def seekMarker(markertoFollow,lastAngle):
       elif angle<0:
         print('Tracking to the left.')
         turnLeft(angle/4)
-             
-             
+      lastAngle = angle
+      return lastAngle
+
+
+#CRATE HANDLING
+def findCrate(savedMarkers):
+  print('Searching for a crate.')
+  markers = R.see()
+  time.sleep(1)
+  markers = [m for m in markers if (m.info.id not in savedMarkers) and (0<=m.info.id<=31)] #gets rid of markers we've already gotten and those that aren't crates
+  for marker in markers:
+    markertoFollow = marker.info.id
+    print('Found a crate!')
+  if len(markers) == 0:
+    print('Nothing found')
+    turnLeft(40)
+    stop()
+    findCrate(savedMarkers)
+  savedMarkers.append(markertoFollow)
+  followMarker(markertoFollow,True)
+
+def grabCrate(initial):
+  print('Grabbing the crate.')
+  R.enable_5v = True
+  R.motors[0] = -40
+  R.motors[1] = 40
+  time.sleep(0.2) #recoil and getting the servos ready
+  if -10<=initial<=10:
+    turnRight(55)
+    time.sleep(0.2)
+  elif initial>0:
+    turnRight(60)
+    time.sleep(0.2)
+  elif initial<0:
+    turnRight(45)
+    time.sleep(0.2)
+  stop() #increasing precision on full spin
+  R.motors[0] = -120
+  R.motors[1] = 120 #heavy recoil to ensure box goes under wire
+  time.sleep(0.5)
+  stop()
+  R.servos[0] = -130
+  R.servos[1] = 90 #placing wire down
+  R.enable_5v = False #cutting the power to the servos to stop strain
+  goZone()
+  
 
 
 
