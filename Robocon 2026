@@ -149,7 +149,7 @@ def dropCrate():
 def startRound():
   print('Searching for the start tree corner.') #look for marker 76 and route into supply zone
   markers = R.see()
-  markers = [m for m in markers if (m.info.id = 76)]
+  markers = [m for m in markers if (m.info.id == 76)]
   for marker in markers:
     treeMarker = marker.info.id
     print('Found marker',marker.info.id,'!')
