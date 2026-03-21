@@ -130,7 +130,7 @@ def grabCrate(initial):
   R.servos[0] = -130
   R.servos[1] = 90 #placing wire down
   R.enable_5v = False #cutting the power to the servos to stop strain
-  goZone()
+  goCorner()
 
 def dropCrate():
   print('Dropping off the crate.')
@@ -147,74 +147,23 @@ def dropCrate():
 
 #ARENA NAVIGATION
 def startRound():
-  print('Searching for the start tree corner.') #look for marker 76 and route into supply zone
-  markers = R.see()
-  markers = [m for m in markers if (m.info.id == 76)]
-  for marker in markers:
-    treeMarker = marker.info.id
-    print('Found marker',marker.info.id,'!')
-  if len(markers) == 0:
-    print('Nothing found.')
-    turnLeft(40)
-    stop()
-    startRound()
-  f = followMarker(treeMarker,False)
+  stop()
+  R.motors[0] = 250
+  R.motors[1] = -250
   time.sleep(1)
-  turnLeft(35)
-  R.motors[0] = 100
-  R.motors[1] = -100
-  time.sleep(1)
-  turnRight(35)
+  stop()
+  stop()
+  R.motors[0] = 250
+  R.motors[1] = -250
+  stop()
   findCrate(savedMarkers)
 
-def goZone():
-  print('Searching for the end tree corner.') #look for either marker 77 or 78 and route back
-  markers = R.see()
-  markers = [m for m in markers if (77<=m.info.id<=78)]
-  for marker in markers:
-    treeMarker = marker.info.id
-    print('Found marker',treeMarker,'!')
-  if len(markers) == 0:
-    print('Nothing found.')
-    turnRight(30)
-    stop()
-    goZone()
-  followMarker(treeMarker, False)
-  if treeMarker == 78: 
-    turnLeft(35)
-    R.motors[0] = 90
-    R.motors[0] = -90
-    time.sleep(0.2)
-    turnRight(35)
-    stop()
-  elif treeMarker == 77:
-    turnRight(35)
-    R.motors[0] = 90
-    R.motors[0] = -90
-    time.sleep(0.2)
-    turnLeft(35)
-    stop()
-  goCorner()
 
 def goCorner():
   print('Searching for the zone corner.')
   markers = R.see()
-  for m in markers:
-    mid = m.info.id
-    if 118<=mid<=122:
-      print('Checking the right side.')
-      angle = 10*(123-mid)
-      turnRight(angle)
-      goCorner()
-    elif 101<=mid<=105: 
-      print('Checking the top side.')
-      angle = 10*(mid-100)
-      turnLeft(angle)
-      goCorner()
-    elif mid == 100 or mid == 123:
-      print('Found the corner!')
-      cornerMarker = mid
-      break
+  if R.zone == robot.SECTOR.RED: #if the marker is in our zone, move there
+    print('our zone')
   if len(markers) == 0: #in case robot is too close to the wall
     print('MMMMM yummy wall.')
     R.motors[0] = -25
