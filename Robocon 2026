@@ -110,10 +110,9 @@ def findCrate(savedMarkers):
 
 def grabCrate(initial):
   print('Grabbing the crate.')
-  R.enable_5v = True
   R.motors[0] = -40
   R.motors[1] = 40
-  time.sleep(0.2) #recoil and getting the servos ready
+  time.sleep(0.2) #recoil 
   if -10<=initial<=10:
     turnRight(55)
     time.sleep(0.2)
@@ -149,6 +148,7 @@ def dropCrate():
   R.servos[0] = -130
   R.servos[1] = 90 #placing the wire upright
   R.enable_5v = False #cutting the power to the servos to stop strain
+  startRound()
 
 #ARENA NAVIGATION
 def startRound():
@@ -168,15 +168,15 @@ def goCorner():
   print('Searching for the zone corner.')
   zoneMarkers = [[123,100],[105,106],[118,117],[111,112]] #red, yellow, blue, and green corner markers
   markers = R.see()
-  if R.zone = robot.TEAM.RED: 
+  if R.zone == robot.TEAM.RED: 
     lookingFor = 0
-  elif R.zone = robot.TEAM.YELLOW: 
+  elif R.zone == robot.TEAM.YELLOW: 
     lookingFor = 1
-  if R.zone = robot.TEAM.BLUE: 
+  if R.zone == robot.TEAM.BLUE: 
     lookingFor = 2
-  if R.zone = robot.TEAM.GREEN: 
+  if R.zone == robot.TEAM.GREEN: 
     lookingFor = 3
-  markers = [m for m in markers if m.info.id in zoneMarkers[lookingfor]]
+  markers = [m for m in markers if m.info.id in zoneMarkers[lookingFor]]
   for m in markers:
     cornerMarker = m.info.id
     print('Found our corner!')
@@ -184,8 +184,13 @@ def goCorner():
     print('MMMMM yummy wall.')
     R.motors[0] = -25
     R.motors[1] = 25
-    time.stop(0.2)
+    time.sleep(0.2)
     turnLeft(30)
+    stop()
+    R.motors[0] = 50
+    R.motors[1] = -50
+    time.sleep(1)
+    stop()
     goCorner()
   followMarker(cornerMarker,False)
   dropCrate()
