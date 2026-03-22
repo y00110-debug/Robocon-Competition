@@ -136,7 +136,6 @@ def grabCrate(initial):
 
 def dropCrate():
   print('Dropping off the crate.')
-  R.enable_5v = True
   R.motors[0] = -70
   R.motors[1] = 70
   time.sleep(0.2) #recoil and getting the servos ready
