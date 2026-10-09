@@ -1,0 +1,144 @@
+#Hello(2)Code to make the LED Flash
+import robot
+import time
+R=robot.Robot()
+
+
+R.gpio[2].mode=robot.OUTPUT
+R.gpio[2].digital=True
+
+R.gpio[1].mode=robot.OUTPUT
+R.gpio[1].digital=False
+time.sleep(1)
+outputstate = True
+
+while True:
+    R.gpio[2].digital = outputstate
+    R.gpio[1].digital = not outputstate
+    time.sleep(1)
+    outputstate = not outputstate
+
+
+#Hello(11)Code for When the Switch is Used to Turn the LED ON or OFF
+import robot
+import time
+R=robot.Robot()
+R.gpio[0].mode=robot.INPUT
+R.gpio[1].mode=robot.OUTPUT
+R.gpio[2].mode=robot.OUTPUT
+
+while True:
+    print(R.gpio[0].digital)
+    if R.gpio[0].digital == False: #turns led on
+        R.gpio[2].digital=True
+        R.gpio[1].digital=False
+        time.sleep(1)
+
+    if R.gpio[0].digital == True: #turns led off
+        R.gpio[2].digital=False
+        R.gpio[1].digital=True
+        time.sleep(1)
+
+print(“hello”)
+
+#Hello(30)Code for When the IP SENSOR(is that its name?) is Used to Turn the LED ON or OFF when it Detects Something Nearby
+import robot
+import time
+R=robot.Robot()
+R.gpio[0].mode=robot.INPUT
+R.gpio[1].mode=robot.OUTPUT
+R.gpio[2].mode=robot.OUTPUT
+
+while True:
+    print(R.gpio[0].digital)
+    if R.gpio[0].digital == False: 
+        while R.gpio[0].digital == False:  
+            R.gpio[2].digital=True
+            R.gpio[1].digital=False
+            time.sleep(1)
+            R.gpio[2].digital=False #turns leds off
+            R.gpio[1].digital=True
+            time.sleep(1)
+
+    else:
+        R.gpio[2].digital=False #turns leds off
+        R.gpio[1].digital=True
+        time.sleep(1)
+
+print ("hello")
+
+#Hello(37)Code for When the Switch is Used to Make the Servo Move or Not
+import robot
+import time
+R=robot.Robot()
+R.gpio[0].mode=robot.INPUT
+R.gpio[1].mode=robot.OUTPUT
+R.gpio[2].mode=robot.OUTPUT
+
+#R = robot.Robot()R.servos[0].mode = robot.PWM_SERVO
+
+while True:
+    print("w")
+    if R.gpio[0].digital == False:
+        R.servos[0]=100
+    #set servo 1 to the -100%
+        time.sleep(1)
+        R.servos[0]=0    
+        time.sleep(1)
+    else:
+        R.servos[0]=0
+        time.sleep(1)
+
+#Hello(57)Code for Making the Servo Move in the Direction of the AprilTag Sensedimport robot
+import time
+R=robot.Robot()
+R.gpio[0].mode=robot.INPUT
+R.gpio[1].mode=robot.OUTPUT
+R.gpio[2].mode=robot.OUTPUT
+
+#R = robot.Robot()R.servos[0].mode = robot.PWM_SERVO
+
+while True:
+    markers=R.see()
+    #print(markers)
+    for marker in markers:
+        print(marker.bearing.y)
+        R.servos[0]=-10*(marker.bearing.y)
+        #set servo 1 to the -100%
+        time.sleep(1)
+
+
+#Hello(60)Code for Making the Ultrasonic Sensor Work
+import robot
+import time
+R=robot.Robot()
+R.gpio[0].mode=robot.INPUT
+R.gpio[1].mode=robot.OUTPUT
+R.gpio[2].mode=robot.OUTPUT
+
+#R = robot.Robot()R.servos[0].mode = robot.PWM_SERVO
+
+while True:
+    sensor=robot.UltrasonicSensor(R.gpio[1],R.gpio[0])
+    distance=sensor.read()
+    print(distance)
+
+#Hello(70)Code for Making the Motors Move
+import robot
+import time
+R=robot.Robot()
+R.gpio[0].mode=robot.INPUT
+R.gpio[1].mode=robot.OUTPUT
+R.gpio[2].mode=robot.OUTPUT
+
+#R = robot.Robot()R.servos[0].mode = robot.PWM_SERVO
+
+while True:
+#set motor 1 to 60% power
+    R.motors[0]=100
+    #one of the motors goes the other way but this code makes it go in a straight line
+    R.motors[1]=-100
+#turn both motors off#
+    time.sleep(1)
+    R.motors[0]=0
+    R.motors[1]=0
